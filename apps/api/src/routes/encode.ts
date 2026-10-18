@@ -1,4 +1,4 @@
-import { Elysia, t } from "elysia";
+import { Router, t } from "@cryptowave/http";
 import { parseWav, writeWav, embedLSB, calculateCapacity, calculateMetrics, appendRecoveryChunk, buildRecoveryAad, RECOVERY_FORMAT_VERSION, RECOVERY_KDF_ID, RECOVERY_CIPHER_ID } from "@cryptowave/audio";
 import { encryptMessage, encryptBytes } from "@cryptowave/crypto";
 import {
@@ -15,7 +15,7 @@ import {
 // MAX_RECOVERY_PAYLOAD_SIZE inside the audio package.
 const MAX_UPLOAD_SIZE = 160 * 1024 * 1024; // 160 MB
 
-export const encodeRoute = new Elysia().post(
+export const encodeRoute = new Router().post(
   "/api/v1/encode",
   async ({ body, set }) => {
     const { audio, message, password, lsbDepth: rawLsbDepth } = body;

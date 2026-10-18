@@ -1,4 +1,4 @@
-import { Elysia, t } from "elysia";
+import { Router, t } from "@cryptowave/http";
 import { parseWav, extractLSB, extractLSBHeader, extractRecoveryChunk } from "@cryptowave/audio";
 import { decryptMessage } from "@cryptowave/crypto";
 import {
@@ -10,7 +10,7 @@ import {
   HEADER_SIZE,
 } from "@cryptowave/protocol";
 
-export const decodeRoute = new Elysia().post(
+export const decodeRoute = new Router().post(
   "/api/v1/decode",
   async ({ body, set }) => {
     const { stegoAudio, password, lsbDepth: rawLsbDepth } = body;

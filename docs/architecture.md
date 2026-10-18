@@ -1,13 +1,13 @@
 # CryptoWave System Architecture
 
-CryptoWave is a backend-first TypeScript monorepo built with Bun, Turborepo, and Elysia. It implements password-protected audio steganography using AES-256-GCM authenticated encryption and 1-bit / 2-bit LSB (Least Significant Bit) embedding in 16-bit PCM WAV audio.
+CryptoWave is a backend-first TypeScript monorepo built with Bun and Turborepo, with an in-repo HTTP router (`packages/http`) and in-repo crypto primitives. It implements password-protected audio steganography using AES-256-GCM authenticated encryption and 1-bit / 2-bit LSB (Least Significant Bit) embedding in 16-bit PCM WAV audio.
 
 ## Package Architecture
 
 ```
 cryptowave/
 ├── apps/
-│   └── api/                  # Elysia REST API (/health, /api/v1/encode, /api/v1/decode, /api/v1/analyze)
+│   └── api/                  # REST API (in-repo router) (/health, /api/v1/encode, /api/v1/decode, /api/v1/analyze)
 ├── packages/
 │   ├── crypto/               # AES-256-GCM + scrypt KDF + AAD
 │   ├── protocol/             # CWAV Binary packet encoder/decoder & validation

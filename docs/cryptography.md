@@ -3,7 +3,7 @@
 CryptoWave enforces strict cryptographic practices using Node/Bun `crypto` primitives.
 
 ## 1. Key Derivation Function (KDF)
-- **Algorithm**: `scrypt` (`scryptSync`)
+- **Algorithm**: `scrypt` (RFC 7914, implemented in `packages/crypto/src/scrypt.ts`; AES-256-GCM in `gcm.ts`/`aes.ts`)
 - **Parameters**:
   - CPU/Memory Cost ($N$): $32768$ ($2^{15}$)
   - Block Size ($r$): 8

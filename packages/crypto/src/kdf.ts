@@ -1,4 +1,4 @@
-import { scryptSync, randomBytes } from "node:crypto";
+import { scrypt } from "./scrypt";
 
 export const SALT_BYTE_LENGTH = 16;
 export const KEY_BYTE_LENGTH = 32; // 256 bits
@@ -10,7 +10,7 @@ export interface ScryptOptions {
 }
 
 export function generateSalt(length = SALT_BYTE_LENGTH): Uint8Array {
-  return new Uint8Array(randomBytes(length));
+  return crypto.getRandomValues(new Uint8Array(length));
 }
 
 export function deriveKey(
@@ -30,12 +30,6 @@ export function deriveKey(
   const r = options?.r ?? 8;
   const p = options?.p ?? 1;
 
-  const derived = scryptSync(password, salt, keyLength, {
-    N,
-    r,
-    p,
-    maxmem: 64 * 1024 * 1024,
-  });
-
-  return new Uint8Array(derived.buffer, derived.byteOffset, derived.byteLength);
+  const passwordBytes = typeof password === "string" ? new TextEncoder().encode(password) : password;
+  return scrypt(passwordBytes, salt, keyLength, { N, r, p, maxmem: 64 * 1024 * 1024 });
 }

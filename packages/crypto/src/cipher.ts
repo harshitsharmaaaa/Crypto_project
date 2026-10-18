@@ -1,5 +1,5 @@
-import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
 import { deriveKey, generateSalt, KEY_BYTE_LENGTH } from "./kdf";
+import { gcmEncrypt, gcmDecrypt } from "./gcm";
 
 export const NONCE_BYTE_LENGTH = 12; // 96 bits for GCM
 export const TAG_BYTE_LENGTH = 16;   // 128-bit authentication tag
@@ -12,7 +12,7 @@ export interface EncryptionResult {
 }
 
 export function generateNonce(length = NONCE_BYTE_LENGTH): Uint8Array {
-  return new Uint8Array(randomBytes(length));
+  return crypto.getRandomValues(new Uint8Array(length));
 }
 
 export function encryptPayload(
@@ -25,23 +25,8 @@ export function encryptPayload(
   }
 
   const nonce = generateNonce();
-  const cipher = createCipheriv("aes-256-gcm", Buffer.from(key), Buffer.from(nonce));
-
-  if (aad && aad.length > 0) {
-    cipher.setAAD(Buffer.from(aad));
-  }
-
-  const ciphertextBuf = Buffer.concat([
-    cipher.update(Buffer.from(plaintext)),
-    cipher.final(),
-  ]);
-  const tagBuf = cipher.getAuthTag();
-
-  return {
-    ciphertext: new Uint8Array(ciphertextBuf.buffer, ciphertextBuf.byteOffset, ciphertextBuf.byteLength),
-    nonce,
-    tag: new Uint8Array(tagBuf.buffer, tagBuf.byteOffset, tagBuf.byteLength),
-  };
+  const { ciphertext, tag } = gcmEncrypt(key, nonce, plaintext, aad);
+  return { ciphertext, nonce, tag };
 }
 
 export function decryptPayload(
@@ -61,22 +46,11 @@ export function decryptPayload(
     throw new Error(`Invalid authentication tag length: expected ${TAG_BYTE_LENGTH} bytes, got ${tag.length}`);
   }
 
-  const decipher = createDecipheriv("aes-256-gcm", Buffer.from(key), Buffer.from(nonce));
-  decipher.setAuthTag(Buffer.from(tag));
-
-  if (aad && aad.length > 0) {
-    decipher.setAAD(Buffer.from(aad));
+  const plaintext = gcmDecrypt(key, nonce, ciphertext, tag, aad);
+  if (!plaintext) {
+    throw new Error("AES-GCM decryption / authentication failed. Incorrect password or tampered ciphertext/AAD.");
   }
-
-  try {
-    const plaintextBuf = Buffer.concat([
-      decipher.update(Buffer.from(ciphertext)),
-      decipher.final(),
-    ]);
-    return new Uint8Array(plaintextBuf.buffer, plaintextBuf.byteOffset, plaintextBuf.byteLength);
-  } catch (err) {
-    throw new Error("AES-GCM decryption / authentication failed. Incorrect password or tampered ciphertext/AAD.", { cause: err });
-  }
+  return plaintext;
 }
 
 export function encryptMessage(

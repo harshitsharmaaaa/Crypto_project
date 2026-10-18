@@ -16,6 +16,7 @@
     "paths": {
       "@cryptowave/crypto": ["packages/crypto/src/index.ts"],
       "@cryptowave/protocol": ["packages/protocol/src/index.ts"],
+      "@cryptowave/http": ["packages/http/src/index.ts"],
       "@cryptowave/audio": ["packages/audio/src/index.ts"],
       "@/*": ["apps/web/*"]
     }

@@ -1,11 +1,10 @@
 # 🌊 CryptoWave — Password-Protected Audio Steganography Laboratory
 
-> Hide encrypted secrets inside WAV audio with **AES-256-GCM + scrypt** and **1/2-bit LSB steganography** — wrapped in a versioned `CWAV` binary protocol, a typed Elysia REST API, and a Next.js security-console frontend.
+> Hide encrypted secrets inside WAV audio with **AES-256-GCM + scrypt** and **1/2-bit LSB steganography** — wrapped in a versioned `CWAV` binary protocol, a typed REST API on an in-repo HTTP router, and a Next.js security-console frontend.
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?logo=typescript&logoColor=white)
 ![Bun](https://img.shields.io/badge/Bun-1.3-black?logo=bun&logoColor=white)
 ![Turborepo](https://img.shields.io/badge/Turborepo-2.4-EF4444?logo=turborepo&logoColor=white)
-![Elysia](https://img.shields.io/badge/Elysia-1.2-8B5CF6)
 ![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js&logoColor=white)
 
 ---
@@ -28,10 +27,11 @@
 cryptowave/
 ├── packages/
 │   ├── protocol/   # CWAV v1 binary packet — encode / decode / validate
-│   ├── crypto/     # scrypt KDF + AES-256-GCM cipher suite
+│   ├── crypto/     # in-repo scrypt KDF + AES-256-GCM (SHA-256, AES, GHASH implemented here)
+│   ├── http/       # in-repo HTTP router, CORS and body validation (replaces Elysia)
 │   └── audio/      # RIFF PCM WAV codec + LSB engine + SNR metrics
 ├── apps/
-│   ├── api/        # Elysia REST API — /health, /api/v1/encode|decode|analyze
+│   ├── api/        # REST API — /health, /api/v1/encode|decode|analyze
 │   └── web/        # Next.js 15 laboratory — encode, decode, analyze, attack-lab
 ├── scripts/        # CLI, E2E demo, integration + robustness harnesses
 ├── docs/           # Architecture, protocol spec, cryptography, threat model
@@ -96,7 +96,7 @@ Versioned binary layout: `magic 'CWAV' (4B) | version | kdfId | cipherId | flags
 
 ### `packages/crypto` — Authenticated encryption
 
-- `deriveKey(password, salt)` via `scryptSync`
+- `deriveKey(password, salt)` via the in-repo `scrypt` (RFC 7914)
 - `encryptMessage(message, password, aad)` → `{ ciphertext, salt, nonce, tag }`
 - `decryptMessage(...)` — wrong password / tampered AAD fails closed with auth error
 - Full UTF-8 / Unicode support
@@ -109,7 +109,7 @@ Versioned binary layout: `magic 'CWAV' (4B) | version | kdfId | cipherId | flags
 
 ---
 
-## 🌐 API (`apps/api` — Elysia)
+## 🌐 API (`apps/api`)
 
 | Method | Route | Description |
 |--------|-------|-------------|
@@ -166,8 +166,10 @@ Covered: KDF determinism, GCM auth failure on wrong password, AAD binding, packe
 
 ## 🛠️ Tech Stack
 
-**Runtime / Toolchain:** Bun 1.3 · TypeScript 5.7 (strict) · Turborepo 2.4 · Node `crypto`
-**Backend:** Elysia + `@elysiajs/cors`
+**Runtime / Toolchain:** Bun 1.3 · TypeScript 5.7 (strict) · Turborepo 2.4
+**Backend:** no third-party runtime dependencies — `@cryptowave/http` (router/CORS/validation) and `@cryptowave/crypto` (AES-256-GCM, scrypt, SHA-256) are implemented in this repo
+
+> **Security note:** the cryptographic primitives are hand-written for educational purposes. They are verified against NIST/RFC test vectors and `node:crypto` (see `packages/crypto/src/internal-vs-node.test.ts`), but are not constant-time or audited. Do not use them to protect real secrets.
 **Frontend:** Next.js 15 · React 19 · Tailwind CSS · lucide-react · `clsx` + `tailwind-merge`
 
 ---

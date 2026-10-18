@@ -1,12 +1,11 @@
-import { Elysia } from "elysia";
-import { cors } from "@elysiajs/cors";
+import { Router, cors } from "@cryptowave/http";
 import { healthRoute } from "./routes/health";
 import { encodeRoute } from "./routes/encode";
 import { decodeRoute } from "./routes/decode";
 import { analyzeRoute } from "./routes/analyze";
 import { restoreRoute } from "./routes/restore";
 
-export const app = new Elysia()
+export const app = new Router()
   .use(
     cors({
       origin: true, // Allow any origin in dev or specify client port

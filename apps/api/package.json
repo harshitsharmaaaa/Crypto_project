@@ -14,9 +14,8 @@
   "dependencies": {
     "@cryptowave/audio": "workspace:*",
     "@cryptowave/crypto": "workspace:*",
-    "@cryptowave/protocol": "workspace:*",
-    "@elysiajs/cors": "^1.4.2",
-    "elysia": "^1.2.0"
+    "@cryptowave/http": "workspace:*",
+    "@cryptowave/protocol": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "latest",

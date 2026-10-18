@@ -29,7 +29,7 @@ export default function DocsPage() {
             <div className="rounded border border-zinc-800 bg-zinc-950 p-4 text-[11px] text-zinc-300 font-mono">
               cryptowave/ <br />
               ├── apps/ <br />
-              │ ├── api/ # Elysia REST API (/encode, /decode, /analyze) <br />
+              │ ├── api/ # REST API (/encode, /decode, /analyze) <br />
               │ └── web/ # Next.js 15 App Router Security Console <br />
               ├── packages/ <br />
               │ ├── crypto/ # AES-256-GCM + scrypt KDF + AAD <br />

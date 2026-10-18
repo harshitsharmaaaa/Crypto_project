@@ -1,11 +1,11 @@
-import { Elysia, t } from "elysia";
+import { Router, t } from "@cryptowave/http";
 import { extractRecoveryChunk, buildRecoveryAad } from "@cryptowave/audio";
 import { decryptBytes } from "@cryptowave/crypto";
 
 // Bounded upload ceiling for the restore endpoint, matching the encode route.
 const MAX_RESTORE_UPLOAD_SIZE = 160 * 1024 * 1024; // 160 MB
 
-export const restoreRoute = new Elysia().post(
+export const restoreRoute = new Router().post(
   "/api/v1/restore",
   async ({ body, set }) => {
     const { stegoAudio, password } = body;
